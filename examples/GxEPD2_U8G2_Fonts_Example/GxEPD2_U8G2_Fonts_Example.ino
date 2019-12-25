@@ -1,3 +1,8 @@
+#include <Adafruit_GFX.h>
+#include <Adafruit_SPITFT.h>
+#include <Adafruit_SPITFT_Macros.h>
+#include <gfxfont.h>
+
 // Display Library example for SPI e-paper panels from Dalian Good Display and boards from Waveshare.
 // Requires HW SPI and Adafruit_GFX. Caution: these e-papers require 3.3V supply AND data lines!
 //
@@ -76,7 +81,7 @@
 //GxEPD2_BW<GxEPD2_213, GxEPD2_213::HEIGHT> display(GxEPD2_213(/*CS=15*/ SS, /*DC=4*/ 4, /*RST=5*/ 5, /*BUSY=16*/ 16));
 //GxEPD2_BW<GxEPD2_290, GxEPD2_290::HEIGHT> display(GxEPD2_290(/*CS=15*/ SS, /*DC=4*/ 4, /*RST=5*/ 5, /*BUSY=16*/ 16));
 //GxEPD2_BW<GxEPD2_270, GxEPD2_270::HEIGHT> display(GxEPD2_270(/*CS=15*/ SS, /*DC=4*/ 4, /*RST=5*/ 5, /*BUSY=16*/ 16));
-//GxEPD2_BW<GxEPD2_420, GxEPD2_420::HEIGHT> display(GxEPD2_420(/*CS=15*/ SS, /*DC=4*/ 4, /*RST=5*/ 5, /*BUSY=16*/ 16));
+GxEPD2_BW<GxEPD2_420, GxEPD2_420::HEIGHT> display(GxEPD2_420(/*CS=15*/ SS, /*DC=4*/ 4, /*RST=5*/ 5, /*BUSY=16*/ 16));
 // can use only half buffer size
 //GxEPD2_BW < GxEPD2_583, GxEPD2_583::HEIGHT / 2 > display(GxEPD2_583(/*CS=15*/ SS, /*DC=4*/ 4, /*RST=5*/ 5, /*BUSY=16*/ 16));
 //GxEPD2_BW < GxEPD2_750, GxEPD2_750::HEIGHT / 2 > display(GxEPD2_750(/*CS=15*/ SS, /*DC=4*/ 4, /*RST=5*/ 5, /*BUSY=16*/ 16));
@@ -165,15 +170,15 @@ void setup()
   display.init();
   u8g2Fonts.begin(display); // connect u8g2 procedures to Adafruit GFX
   helloWorld();
-  delay(1000);
+  delay(10000);
   helloArduino();
-  delay(1000);
+  delay(10000);
   helloEpaper();
-  delay(1000);
+  delay(10000);
   showFont("u8g2_font_helvR14_tf", u8g2_font_helvR14_tf); // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
-  delay(2000);
+  delay(20000);
   showFont("u8g2_font_profont22_mr", u8g2_font_profont22_mr); // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
-  delay(1000);
+  delay(10000);
   Serial.println("setup done");
 }
 
@@ -237,7 +242,8 @@ void helloEpaper()
   u8g2Fonts.setFontDirection(0);            // left to right (this is default)
   u8g2Fonts.setForegroundColor(fg);         // apply Adafruit GFX color
   u8g2Fonts.setBackgroundColor(bg);         // apply Adafruit GFX color
-  u8g2Fonts.setFont(u8g2_font_helvR14_tf);  // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  u8g2Fonts.setFont(u8g2_font_profont10_tf);  // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  //u8g2Fonts.setFont(u8g2_font_helvR14_tf);  // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
   uint16_t x = (display.width() - 160) / 2;
   uint16_t y = display.height() * 3 / 4;
   display.setPartialWindow(0, y - 14, display.width(), 20);
@@ -284,5 +290,3 @@ void drawFont(const char name[])
   u8g2Fonts.println("pqrstuvwxyz{|}~ ");
   u8g2Fonts.println("Umlaut ÄÖÜäéöü");
 }
-
-

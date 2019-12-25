@@ -1,3 +1,5 @@
+
+
 // GxEPD2_WiFi_Example : Display Library example for SPI e-paper panels from Dalian Good Display and boards from Waveshare.
 // Requires HW SPI and Adafruit_GFX. Caution: these e-papers require 3.3V supply AND data lines!
 //
@@ -34,9 +36,15 @@
 // mapping suggestion for AVR, UNO, NANO etc.
 // BUSY -> 7, RST -> 9, DC -> 8, CS-> 10, CLK -> 13, DIN -> 11
 //
-
+#define ENABLE_GxEPD2_GFX 0
+#include <Adafruit_GFX.h>
+#include <Adafruit_SPITFT.h>
+#include <Adafruit_SPITFT_Macros.h>
+#include <gfxfont.h>
 #include <GxEPD2_BW.h>
 #include <GxEPD2_3C.h>
+#include <U8g2_for_Adafruit_GFX.h>
+
 
 #define EPD_CS SS
 
@@ -122,9 +130,9 @@ const char fp_rawcontent[20]  = {0xcc, 0xaa, 0x48, 0x48, 0x66, 0x46, 0x0e, 0x91,
 #else
 const char* fp_rawcontent     = "cc aa 48 48 66 46 0e 91 53 2c 9c 7c 23 2a b1 74 4d 29 9d 33";
 #endif
-const char* host_rawcontent   = "raw.githubusercontent.com";
-const char* path_rawcontent   = "/ZinggJM/GxEPD2/master/extras/bitmaps/";
-const char* path_prenticedavid   = "/prenticedavid/MCUFRIEND_kbv/master/extras/bitmaps/";
+const char* host_rawcontent   = "10.0.0.30";
+const char* path_rawcontent   = "/";
+const char* path_prenticedavid   = "";
 
 void showBitmapFrom_HTTP(const char* host, const char* path, const char* filename, int16_t x, int16_t y, bool with_color = true);
 void showBitmapFrom_HTTPS(const char* host, const char* path, const char* filename, const char* fingerprint, int16_t x, int16_t y, bool with_color = true);
@@ -132,8 +140,12 @@ void showBitmapFrom_HTTPS(const char* host, const char* path, const char* filena
 void showBitmapFrom_HTTP_Buffered(const char* host, const char* path, const char* filename, int16_t x, int16_t y, bool with_color = true);
 void showBitmapFrom_HTTPS_Buffered(const char* host, const char* path, const char* filename, const char* fingerprint, int16_t x, int16_t y, bool with_color = true);
 
+
+U8G2_FOR_ADAFRUIT_GFX u8g2Fonts;
+
 void setup()
 {
+   u8g2Fonts.begin(display); // connect u8g2 procedures to Adafruit GFX
   Serial.begin(115200);
   Serial.println();
   Serial.println("GxEPD2_WiFi_Example");
@@ -146,6 +158,8 @@ void setup()
   WiFi.setAutoConnect(true);
   WiFi.setAutoReconnect(true);
   WiFi.disconnect();
+
+  
 #endif
 
   if (!WiFi.getAutoConnect() || ( WiFi.getMode() != WIFI_STA) || ((WiFi.SSID() != ssid) && String(ssid) != "........"))
@@ -160,7 +174,7 @@ void setup()
     Serial.println(ssid);
     WiFi.begin(ssid, password);
   }
-  int ConnectTimeout = 30; // 15 seconds
+  int ConnectTimeout = 30; // allow up to 30 seconds to connect to WiFi network
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
@@ -179,49 +193,165 @@ void setup()
   // Print the IP address
   Serial.println(WiFi.localIP());
 
-  if ((display.epd2.panel == GxEPD2::GDEW0154Z04) || false)
-  {
-    drawBitmapsBuffered_200x200();
-    drawBitmapsBuffered_other();
-  }
-  else
-  {
-    drawBitmaps_200x200();
-    drawBitmaps_other();
-  }
 
-  //drawBitmaps_test();
-  //drawBitmapsBuffered_test();
-
-  Serial.println("GxEPD2_WiFi_Example done");
+  while (true)
+  {
+       //drawBitmaps_200x200();
+       //display.clearScreen();
+       //delay(1000);
+       //drawBitmaps_400x300();
+       int16_t x = 0;
+       int16_t y = 0;
+       //showBitmapFrom_HTTP("10.0.0.30", "/", "text1.bmp", x, y, false);       
+       showBitmapFrom_HTTP_Buffered("10.0.0.30", "/", "text1.bmp", x, y, false);
+       //displayTextFile12();
+       //delay(1000);  // delay for over a minute to then check for a new image
+       //displayTextFile14();
+       //showFont("u8g2_font_8x13_mr", u8g2_font_8x13_mr );
+       //delay(10000); 
+       //showFont("u8g2_font_profont22_mr", u8g2_font_profont22_mr);
+       //delay(10000); 
+       //showFont("u8g2_font_7x13_mr", u8g2_font_7x13_mr);
+      // delay(10000);  // delay for over a minute to then check for a new image
+       //showFont("u8g2_font_t0_12_mr", u8g2_font_t0_12_mr);
+       delay(300000);  // delay for over a minute to then check for a new image
+  }
 }
+
+void displayTextFile16()
+{
+  Serial.println("Display text file:");
+  uint16_t bg = GxEPD_WHITE;
+  uint16_t fg = GxEPD_BLACK;
+  u8g2Fonts.setFontMode(1);                 // use u8g2 transparent mode (this is default)
+  u8g2Fonts.setFontDirection(0);            // left to right (this is default)
+  u8g2Fonts.setForegroundColor(fg);         // apply Adafruit GFX color
+  u8g2Fonts.setBackgroundColor(bg);         // apply Adafruit GFX color
+  u8g2Fonts.setFont(u8g2_font_t0_13_mr);  // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  //u8g2Fonts.setFont(u8g2_font_helvR14_tf);  // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  uint16_t x = (display.width() - 160) / 2;
+  uint16_t y = (display.height() * 3 / 4)-70;
+  display.setPartialWindow(0, y - 14, display.width(), 20);
+  display.firstPage();
+  do
+  {
+    display.fillScreen(bg);
+        Serial.print("X: ");Serial.println(x);
+        Serial.print("Y: ");Serial.println(y);        
+    u8g2Fonts.setCursor(x, y);
+    u8g2Fonts.println("Test file contents will go here!");
+  }
+  while (display.nextPage());
+  Serial.println("Text file display done");
+}
+
+void displayTextFile14()
+{
+  Serial.println("Display text file:");
+  uint16_t bg = GxEPD_WHITE;
+  uint16_t fg = GxEPD_BLACK;
+  u8g2Fonts.setFontMode(1);                 // use u8g2 transparent mode (this is default)
+  u8g2Fonts.setFontDirection(0);            // left to right (this is default)
+  u8g2Fonts.setForegroundColor(fg);         // apply Adafruit GFX color
+  u8g2Fonts.setBackgroundColor(bg);         // apply Adafruit GFX color
+  u8g2Fonts.setFont(u8g2_font_t0_13b_mr );  // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  //u8g2Fonts.setFont(u8g2_font_helvR14_tf);  // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  uint16_t x = (display.width() - 160) / 2;
+  uint16_t y = (display.height() * 3 / 4)-40;
+  display.setPartialWindow(0, y - 14, display.width(), 20);
+  display.firstPage();
+  do
+  {
+    display.fillScreen(bg);
+        Serial.print("X: ");Serial.println(x);
+        Serial.print("Y: ");Serial.println(y);        
+    u8g2Fonts.setCursor(x, y);
+    u8g2Fonts.println("Test file contents will go here!");
+  }
+  while (display.nextPage());
+  Serial.println("Text file display done");
+}
+
+void displayTextFile12()
+{
+  Serial.println("Display text file:");
+  uint16_t bg = GxEPD_WHITE;
+  uint16_t fg = GxEPD_BLACK;
+  u8g2Fonts.setFontMode(1);                 // use u8g2 transparent mode (this is default)
+  u8g2Fonts.setFontDirection(0);            // left to right (this is default)
+  u8g2Fonts.setForegroundColor(fg);         // apply Adafruit GFX color
+  u8g2Fonts.setBackgroundColor(bg);         // apply Adafruit GFX color
+  u8g2Fonts.setFont(u8g2_font_t0_13b_mr);  // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  //u8g2Fonts.setFont(u8g2_font_helvR14_tf);  // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  uint16_t x = (display.width() - 160) / 2;
+  uint16_t y = display.height() * 3 / 4;
+  display.setPartialWindow(0, y - 14, display.width(), 20);
+  display.firstPage();
+  do
+  {
+    display.fillScreen(bg);
+        Serial.print("X: ");Serial.println(x);
+        Serial.print("Y: ");Serial.println(y);        
+    u8g2Fonts.setCursor(x, y);
+    u8g2Fonts.println("Test file contents will go here!");
+  }
+  while (display.nextPage());
+  Serial.println("Text file display done");
+}
+
+void drawFont(const char name[])
+{
+  //display.setRotation(0);
+  display.fillScreen(GxEPD_WHITE);
+  u8g2Fonts.setCursor(0, 0);
+  u8g2Fonts.println();
+  u8g2Fonts.println(name);
+  u8g2Fonts.println(" !\"#$%&'()*+,-./");
+  u8g2Fonts.println("0123456789:;<=>?");
+  u8g2Fonts.println("@ABCDEFGHIJKLMNO");
+  u8g2Fonts.println("PQRSTUVWXYZ[\\]^_");
+  u8g2Fonts.println("`abcdefghijklmno");
+  u8g2Fonts.println("pqrstuvwxyz{|}~ ");
+  u8g2Fonts.println("Umlaut ÄÖÜäéöü");
+}
+
 
 void loop(void)
 {
+}
+
+void showFont(const char name[], const uint8_t *font)
+{
+  display.setFullWindow();
+  display.setRotation(0);
+  u8g2Fonts.setFontMode(1);                   // use u8g2 transparent mode (this is default)
+  u8g2Fonts.setFontDirection(0);              // left to right (this is default)
+  u8g2Fonts.setForegroundColor(GxEPD_BLACK);  // apply Adafruit GFX color
+  u8g2Fonts.setBackgroundColor(GxEPD_WHITE);  // apply Adafruit GFX color
+  u8g2Fonts.setFont(font); // select u8g2 font from here: https://github.com/olikraus/u8g2/wiki/fntlistall
+  display.firstPage();
+  do
+  {
+    drawFont(name);
+  }
+  while (display.nextPage());
 }
 
 void drawBitmaps_200x200()
 {
   int16_t x = (display.width() - 200) / 2;
   int16_t y = (display.height() - 200) / 2;
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "logo200x200.bmp", fp_rawcontent, x, y);
-  delay(2000);
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "first200x200.bmp", fp_rawcontent, x, y);
-  delay(2000);
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "second200x200.bmp", fp_rawcontent, x, y);
-  delay(2000);
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "third200x200.bmp", fp_rawcontent, x, y);
-  delay(2000);
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "fourth200x200.bmp", fp_rawcontent, x, y);
-  delay(2000);
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "fifth200x200.bmp", fp_rawcontent, x, y);
-  delay(2000);
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "sixth200x200.bmp", fp_rawcontent, x, y);
-  delay(2000);
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "seventh200x200.bmp", fp_rawcontent, x, y);
-  delay(2000);
-  showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "eighth200x200.bmp", fp_rawcontent, x, y);
-  delay(2000);
+  //showBitmapFrom_HTTPS(host_rawcontent, path_rawcontent, "text1.png", fp_rawcontent, x, y);
+  showBitmapFrom_HTTP("10.0.0.30", "/", "text1.bmp", x, y, false);
+}
+void drawBitmaps_400x300()
+{
+  int16_t x = 0;
+  //int16_t x = (display.width() - 400) / 2;
+  int16_t y = 0;
+  //int16_t y = (display.height() - 300) / 2;
+  //showBitmapFrom_HTTPS("10.0.0.30", "/", "text1.bmp", fp_rawcontent, x, y);
+  showBitmapFrom_HTTP("10.0.0.30", "/", "text1.bmp", x, y, false);
 }
 
 void drawBitmaps_other()
@@ -286,6 +416,12 @@ void drawBitmapsBuffered_200x200()
   delay(2000);
 }
 
+void drawBitmapsBuffered_400x300()
+{
+  int16_t w2 = display.width() / 2;
+  int16_t h2 = display.height() / 2;
+  showBitmapFrom_HTTP_Buffered("www.squix.org", "/blog/wunderground/", "chanceflurries.bmp", w2 - 50, h2 - 50, false);
+}  
 void drawBitmapsBuffered_other()
 {
   int16_t w2 = display.width() / 2;
@@ -398,6 +534,8 @@ void showBitmapFrom_HTTP(const char* host, const char* path, const char* filenam
       Serial.print(width);
       Serial.print('x');
       Serial.println(height);
+      Serial.print("Display Width: ");Serial.println(display.width());
+      Serial.print("Display Height: ");Serial.println(display.height());
       // BMP rows are padded (if needed) to 4-byte boundary
       uint32_t rowSize = (width * depth / 8 + 3) & ~3;
       if (depth < 8) rowSize = ((width * depth + 8 - depth) / 8 + 3) & ~3;
@@ -807,7 +945,8 @@ void showBitmapFrom_HTTPS(const char* host, const char* path, const char* filena
 #if USE_BearSSL
   if (fingerprint) client.setFingerprint((uint8_t*)fingerprint);
 #endif
-  if (!client.connect(host, httpsPort))
+  if (!client.connect(host, httpPort))
+  //if (!client.connect(host, httpsPort))  // PH
   {
     Serial.println("connection failed");
     return;
@@ -1054,7 +1193,8 @@ void drawBitmapFrom_HTTPS_ToBuffer(const char* host, const char* path, const cha
 #if USE_BearSSL
   if (fingerprint) client.setFingerprint((uint8_t*)fingerprint);
 #endif
-  if (!client.connect(host, httpsPort))
+  if (!client.connect(host, httpPort))
+    //if (!client.connect(host, httpsPort))  // PH
   {
     Serial.println("connection failed");
     return;
